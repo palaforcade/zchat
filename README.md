@@ -1,74 +1,77 @@
 # zchat
 
-Generate shell commands from natural language using Claude AI.
+Generate shell commands from natural language using AI.
+
+Supports **Ollama** (local, free) and **Anthropic Claude** (cloud, paid).
 
 ## Installation
-
-1. Download the binary for your platform from releases
-2. Move to your PATH:
-   ```bash
-   mv zchat-* ~/.local/bin/zchat
-   chmod +x ~/.local/bin/zchat
-   ```
-3. Set your Anthropic API key:
-   ```bash
-   export ANTHROPIC_API_KEY=sk-ant-api03-xxx
-   ```
-
-## Usage
-
-```bash
-zchat <natural language query>
-```
-
-### Examples
-
-```bash
-# File operations
-zchat list the number of lines in data.csv
-zchat find all python files modified in the last week
-
-# Text processing
-zchat search for "error" in all log files
-zchat count unique words in README.md
-
-# System info
-zchat show disk usage sorted by size
-zchat list running processes using more than 1GB memory
-```
-
-## Configuration
-
-### Environment Variable (Recommended)
-```bash
-export ANTHROPIC_API_KEY=sk-ant-api03-xxx
-```
-
-### Config File (Optional)
-Create `~/.config/zchat/config.yaml`:
-```yaml
-api_key: sk-ant-api03-xxx
-model: claude-sonnet-4-5-20250929
-max_context_lines: 20
-```
-
-## Safety Features
-
-zchat detects and warns about potentially dangerous commands:
-- Recursive deletions (`rm -rf`)
-- Disk operations (`dd`, `mkfs`)
-- Commands that download and execute code
-- Fork bombs and system disruption
-
-Dangerous commands require explicit confirmation before execution.
-
-## Building from Source
 
 ```bash
 git clone https://github.com/palaforcade/zchat
 cd zchat
 go build -o zchat
 ```
+
+### Prerequisites
+
+**Option 1: Ollama (Default)**
+```bash
+# Install Ollama
+brew install ollama
+
+# Pull a model
+ollama pull qwen2.5-coder:7b
+```
+
+**Option 2: Anthropic**
+```bash
+export ZCHAT_PROVIDER=anthropic
+export ANTHROPIC_API_KEY=sk-ant-api03-xxx
+```
+
+## Usage
+
+```bash
+./zchat <natural language query>
+```
+
+**Examples:**
+```bash
+./zchat list files in current directory
+./zchat count lines in README.md
+./zchat find all go files modified today
+./zchat show disk usage sorted by size
+```
+
+## Configuration
+
+**Default:** Uses Ollama with `qwen2.5-coder:7b` model.
+
+**Environment Variables:**
+```bash
+export ZCHAT_PROVIDER=ollama           # or "anthropic"
+export ANTHROPIC_API_KEY=sk-ant-xxx    # for Anthropic
+export OLLAMA_URL=http://localhost:11434
+```
+
+**Config File:** `~/.config/zchat/config.yaml`
+```yaml
+provider: ollama
+model: qwen2.5-coder:7b
+ollama_url: http://localhost:11434
+api_key: sk-ant-xxx  # for Anthropic
+max_context_lines: 20
+```
+
+## Safety
+
+Dangerous commands require explicit confirmation:
+- `rm -rf /` - Recursive deletions
+- `dd if=` - Disk operations
+- `| sh` - Piped shell execution
+- `diskutil` - Disk utilities
+
+Configure via `dangerous_patterns` in config file.
 
 ## License
 
